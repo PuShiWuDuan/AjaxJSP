@@ -1,5 +1,7 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@page import="servlet.GetRunTestSevelet" %>
 <%
+	String username = session.getAttribute("username").toString();
 String path = request.getContextPath();
 String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
 %>
@@ -16,7 +18,6 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	<!--
 	<link rel="stylesheet" type="text/css" href="styles.css">
 	-->
-    <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
@@ -26,16 +27,15 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	<script src="js/add.js" type="text/javascript"></script>
     <!-- Bootstrap Core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
-    <script src="http://code.jquery.com/jquery-1.10.2.js"
-	type="text/javascript"></script>
+    <script src="js/jquery.js" type="text/javascript"></script>
+
     <script src="js/app-ajax.js" type="text/javascript"></script>
+     <script src="js/Dir.js" type="text/javascript"></script>
     <!-- Custom CSS -->
     <link href="css/simple-sidebar.css" rel="stylesheet">
-
+    <link href="css/index.css" rel="stylesheet">
 </head>
-
 <body>
-
 <nav class="navbar navbar-default navbar-fixed-top navbar-inverse">
   <div class="container-fluid">
     <!-- Brand and toggle get grouped for better mobile display -->
@@ -76,81 +76,56 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->
 </nav>
-
-
-
-
     <div id="wrapper">
 
         <!-- Sidebar -->
         <div id="sidebar-wrapper">
             <ul class="sidebar-nav">
-			
-			
-			
-			
                 <li class="sidebar-brand">
                     <a href="#">Start Bootstrap</a>
                 </li>
                 <li>
                     <a href="#">6LoWPAN</a>
                 </li>
-                <div class="checkbox">
-							<label>
-							 <!-- <input name="Fruit"  type="checkbox" value="0">  -->
-							  分片测试
-							</label>
-						
-					<ul>
-				
-						<div class="checkbox">
-							<label>
-							  <input name="Fruit"  type="checkbox" value="1">
-							  处理tag不同
-							</label>
+                <%
+                	if(username.contains("admin"))
+                	 {
+ 	               // final  ArrayList<ViewJSP.ReadDirs.Node> Dir= RunTestSevelet.res;
+ 	                    int flag = 0;
+ 	                 	for(int i=0;i<GetRunTestSevelet.res.size();i++)
+ 		                 {
+              	   		   	 if(!GetRunTestSevelet.res.get(i).Dir.contains("."))
+                 		   	 {
+                 		    		if(GetRunTestSevelet.res.get(i).rank==0)
+                 		    		{
+                 		    		    if(flag==1)
+                 		    		    {
+              			         %>
+              			        		</div>
+              			   		<%
+              			   				}
+              			   				else
+              			   				{
+              			   				    flag=1;
+              			   				} 
+              			   		%>
+              			    <div class="TestExzample"  value="<%=GetRunTestSevelet.res.get(i).rank %>"><%=GetRunTestSevelet.res.get(i).value%>	</div>
+							<div class="checkbox"  >
+					     <%
+									}
+									else
+									{
+						  %>
+							<div class="child"><input name="Fruit"  type="checkbox" value="<%=GetRunTestSevelet.res.get(i).Dir%>"><%=GetRunTestSevelet.res.get(i).value%></div>	
+							<%
+									}
+								}
+							}
+						%>
 						</div>
-						<div class="checkbox">	
-							<label>
-							  <input name="Fruit"  type="checkbox" value="2">
-							  处理乱序分片
-							</label>
-						</div>
-						<div class="checkbox">	
-							<label>
-							  <input name="Fruit"  type="checkbox" value="3">
-							  处理分片丢失
-							</label>
-						</div>
-						<div class="checkbox">	
-							<label>
-							  <input name="Fruit"  type="checkbox" value="4">
-							  处理分片重叠
-							</label>
-						</div>
-						<div class="checkbox">	
-							<label>
-							  <input name="Fruit"  type="checkbox" value="5">
-							  处理报头压缩
-							</label>
-						</div>
-						<div class="checkbox">	
-							<label>
-							  <input name="Fruit"  type="checkbox" value="6">
-							  重组分片
-							</label>
-						</div>
-						<div class="checkbox">
-							<label>
-							  <input name="Fruit"  type="checkbox" value="7">
-							  重组超时
-							</label>
-						</div>
-						<div class="checkbox">	
-							<label>
-							  <input name="Fruit"  type="checkbox" value="8">
-							  处理分片重叠
-							</label>
-						</div>
+						<%
+					}
+				 %>
 				<input id="btnShow" type="button" value="加载"/>
 						
 				</ul>		

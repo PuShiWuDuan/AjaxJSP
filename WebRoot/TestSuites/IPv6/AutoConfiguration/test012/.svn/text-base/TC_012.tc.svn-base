@@ -1,0 +1,73 @@
+
+# include the global parameters
+@include /config/globalparam.data
+
+packet Router_Advertisement_1 {
+	header ICMPv6 {
+		ICMP_Type  = 134
+		Code  = 0
+		Message_Body  = [cat 40 00 00 05  00 00 13 88\
+				00 00 03 e8  03 04 40 c0\
+				00 00 00 10  00 00 00 10\
+				00 00 00 00  $RA_prefix  ]
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+		Hop_Limit  = 255
+		Destination_Address  = $All_Nodes_multicast_address 
+	}
+}
+packet Router_Advertisement_2 {
+	header ICMPv6 {
+		ICMP_Type  = 134
+		Code  = 0
+		Message_Body  = [cat 40 00 00 05  00 00 13 88\
+				00 00 03 e8  03 04 40 c0\
+				00 00 00 08  00 00 00 08\
+				00 00 00 00  $RA_prefix ]
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+		Hop_Limit  = 255
+		Destination_Address  = $All_Nodes_multicast_address 
+	}
+}
+packet Neighbor_Solicitation {
+	header ICMPv6 {
+		ICMP_Type  = 135
+		Code  = 0
+		Message_Body  = [cat 00 00 00 00 $AUTO_2]
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+		Hop_Limit  = 255
+		Source_Address = $TN_Link
+		Destination_Address  = $NUT_Solicited
+	}
+}
+
+##############################################################
+# test procedure for test case : TC_012
+##############################################################
+
+create6LoWPAN Router_Advertisement_1
+create6LoWPAN Router_Advertisement_2
+create6LoWPAN Neighbor_Solicitation
+
+info "After the test begin,please restart the DUT"
+
+receive $NdRestart_Time 0 <ipv6:8 8 0x0000000000000000><icmpv6:0 1 0x87><icmpv6:8 16 $NUT_IPv6>
+send6LoWPAN Router_Advertisement_1
+delay 50
+
+#TN send NS for DAD, as the DUT uses the AUTO_2, it will return a NA.
+#Throug this way,it checks whether the DUT has the address.
+#If we set the 'Source_Address=$TN_IPv6',it will cause address resolution
+send6LoWPAN Neighbor_Solicitation
+receive 40 0 <icmpv6:0 1 0x88><icmpv6:8 16 $AUTO_2><icmpv6:26 8 $NUT_MAC>
+send6LoWPAN Router_Advertisement_2
+delay 50
+
+send6LoWPAN Neighbor_Solicitation
+receive 20 0 <icmpv6:0 1 0x88><icmpv6:8 16 $AUTO_2><icmpv6:26 8 $NUT_MAC>
+

@@ -1,0 +1,137 @@
+
+# include the global parameters
+@include /config/globalparam.data
+
+packet Router_Advertisement_A {
+	header ICMPv6 {
+		ICMP_Type  = 134
+		Code  = 0
+		Message_Body  = [cat ff 00 00 06 00 00 13 88 \
+			       00 00 00 00 03 04 40 c0 \
+			       00 00 00 07 00 00 00 07 \
+			       00 00 00 00 $RA_prefix ]
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+		Hop_Limit  = 255
+		Source_Address  =$ND_Source_Address1
+	}
+}
+
+packet Router_Advertisement_B {
+	header ICMPv6 {
+		ICMP_Type  = 134
+		Code  = 0
+		Message_Body  = [cat ff 00 00 0c  00 00 13 88 \
+			       00 00 00 00  03 04 40 c0 \
+			       00 00 00 0c  00 00 00 0c \
+			       00 00 00 00  $RA_prefix]
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+		Hop_Limit  = 255
+		Source_Address  =$ND_Source_Address2
+	}
+}
+
+packet Neighbor_Advertisement_A {
+	header ICMPv6 {
+		ICMP_Type  = 136
+		Code  = 0
+		Message_Body  = [cat e0 00 00 00 $ND_Source_Address1 \
+				02 02 $TN_MAC 00 00 00 00 00 00]
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+		Hop_Limit  = 255
+	}
+}
+
+packet Neighbor_Advertisement_B {
+	header ICMPv6 {
+		ICMP_Type  = 136
+		Code  = 0
+		Message_Body  = [cat e0 00 00 00 $ND_Source_Address2 \
+				 02 02 $TN_MAC 00 00 00 00 00 00]
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+		Hop_Limit  = 255
+	}
+}
+
+packet Echo_Request_A {
+	header ICMPv6 {
+		ICMP_Type  = 128
+		Code  = 0
+		Message_Body  = [cat 00 11 00 01]
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+		Source_Address  = $ND_Source_Address1
+	}
+}
+
+packet Echo_Request_B {
+	header ICMPv6 {
+		ICMP_Type  = 128
+		Code  = 0
+		Message_Body  = [cat 00 11 00 01]
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+	   	Source_Address  = $TN_ND_global_2
+	}
+}
+#for delete cache entry
+packet Echo_Request_C {
+	header ICMPv6 {
+		ICMP_Type  = 128
+		Code  = 0
+		Message_Body  = [cat 00 11 00 01]
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+	   	Source_Address  = $ND_Source_Address2
+	}
+}
+
+##############################################################
+# test procedure for test case : TC_5005
+##############################################################
+
+create6LoWPAN Router_Advertisement_A
+create6LoWPAN Router_Advertisement_B
+create6LoWPAN Neighbor_Advertisement_A
+create6LoWPAN Neighbor_Advertisement_B
+create6LoWPAN Echo_Request_A
+create6LoWPAN Echo_Request_B
+create6LoWPAN Echo_Request_C
+
+#info "After the test begin,please restart the DUT"
+
+auto_reply_na off
+delay 10
+
+send6LoWPAN Router_Advertisement_A
+send6LoWPAN Echo_Request_A
+send6LoWPAN Neighbor_Advertisement_A
+delay 20
+#has Router_A and it's MAC
+
+send6LoWPAN Router_Advertisement_B
+#delay 20
+send6LoWPAN Echo_Request_B
+receive 40 0 <icmpv6:0 1 0x81>
+delay 50
+#Router_A deleted
+
+send6LoWPAN Echo_Request_B
+receive 30 0 <icmpv6:0 1 0x87><icmpv6:8 16 $ND_Source_Address2>
+send6LoWPAN Neighbor_Advertisement_B
+receive 20 0 <icmpv6:0 1 0x81>
+
+info "Let DUT delete the neighbor cache if it exists"
+delay 50
+send6LoWPAN Echo_Request_C 1
+delay 100

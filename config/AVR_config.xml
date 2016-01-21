@@ -1,0 +1,116 @@
+<Configuration>
+    <Type Name="MAC Address">
+        <Entry>
+            <DisplayName>TN MAC Address</DisplayName>
+            <CommandName>mac_address</CommandName>
+            <ParameterName>TN_MAC</ParameterName>
+            <ParameterValue>02:12:13:ff:fe:14:15:16</ParameterValue>
+        </Entry>
+        <Entry>
+            <DisplayName>NUT MAC Address</DisplayName>
+            <CommandName>mac_address</CommandName>
+            <ParameterName>NUT_MAC</ParameterName>
+            <ParameterValue>02:11:22:ff:fe:33:44:58</ParameterValue>
+        </Entry>
+        <Entry>
+            <DisplayName>Mac Other Address 1</DisplayName>
+            <CommandName>mac_address</CommandName>
+            <ParameterName>Mac_Other_1</ParameterName>
+            <ParameterValue>00:12:74:00:12:e6:a4:85</ParameterValue>
+        </Entry>
+    </Type>
+    <Type Name="Link Local Adress">
+        <Entry>
+            <DisplayName>TN Link Local Address</DisplayName>
+            <CommandName>ipv6_address</CommandName>
+            <ParameterName>TN_IPv6</ParameterName>
+            <ParameterValue>fe80::12:13ff:fe14:1516</ParameterValue>
+        </Entry>
+        <Entry>
+            <DisplayName>NUT Link Local Address</DisplayName>
+            <CommandName>ipv6_address</CommandName>
+            <ParameterName>NUT_IPv6</ParameterName>
+            <ParameterValue>fe80::11:22ff:fe33:4458</ParameterValue>
+        </Entry>
+        <Entry>
+            <DisplayName>Link Local Other 1</DisplayName>
+            <CommandName>ipv6_address</CommandName>
+            <ParameterName>Link_Local_Other_1</ParameterName>
+            <ParameterValue>fe80::212:7400:12e6:1438</ParameterValue>
+        </Entry>
+        <Entry>
+            <DisplayName>Link Local Other 2</DisplayName>
+            <CommandName>ipv6_address</CommandName>
+            <ParameterName>Link_Local_Other_2</ParameterName>
+            <ParameterValue>fe80::212:7400:12e6:1539</ParameterValue>
+        </Entry>
+    </Type>
+    <Type Name="Global IPv6 Address and Prefix">
+        <Entry>
+            <DisplayName>Global Prefix</DisplayName>
+            <CommandName>ipv6_address</CommandName>
+            <ParameterName>Global_Prefix</ParameterName>
+            <ParameterValue>aaaa::0</ParameterValue>
+        </Entry>
+        <Entry>
+            <DisplayName>Global T1</DisplayName>
+            <CommandName>ipv6_address</CommandName>
+            <ParameterName>IPv6Global_T1</ParameterName>
+            <ParameterValue>aaaa::12:13ff:fe14:1516</ParameterValue>
+        </Entry>
+        <Entry>
+            <DisplayName>Global D1</DisplayName>
+            <CommandName>ipv6_address</CommandName>
+            <ParameterName>IPv6Global_D1</ParameterName>
+            <ParameterValue>aaaa::11:22ff:fe33:4455</ParameterValue>
+        </Entry>
+        <Entry>
+            <DisplayName>Global Other Prefix</DisplayName>
+            <CommandName>ipv6_address</CommandName>
+            <ParameterName>Global_Other_Prefix</ParameterName>
+            <ParameterValue>abcd::0</ParameterValue>
+        </Entry>
+        <Entry>
+            <DisplayName>Global Other 1</DisplayName>
+            <CommandName>ipv6_address</CommandName>
+            <ParameterName>Global_Other_1</ParameterName>
+            <ParameterValue>abcd::212:e500:874a:b34f</ParameterValue>
+        </Entry>
+        <Entry>
+            <DisplayName>Global Other 2</DisplayName>
+            <CommandName>ipv6_address</CommandName>
+            <ParameterName>Global_Other_2</ParameterName>
+            <ParameterValue>abcd::212:e700:9740:56df</ParameterValue>
+        </Entry>
+    </Type>
+    <!--
+    <Type Name="IPv6 Auto-Config Address">
+        <Entry>
+            <DisplayName>RA Prefix</DisplayName>
+            <CommandName>ipv6_address</CommandName>
+            <ParameterName>RA_prefix</ParameterName>
+            <ParameterValue>aaaa::0</ParameterValue>
+        </Entry>
+        <Entry>
+            <DisplayName>AUTO_1</DisplayName>
+            <CommandName>ipv6_address</CommandName>
+            <ParameterName>AUTO_1</ParameterName>
+            <ParameterValue>aaaa::212:7400:12e6:86ae</ParameterValue>
+        </Entry>
+        <Entry>
+            <DisplayName>AUTO_2</DisplayName>
+            <CommandName>ipv6_address</CommandName>
+            <ParameterName>AUTO_2</ParameterName>
+            <ParameterValue>aaaa::212:7400:12e6:43ae</ParameterValue>
+        </Entry>
+    </Type>
+    -->
+    <Type Name="Time Set">
+        <Entry>
+            <DisplayName>ND Restart Time(units:100ms)</DisplayName>
+            <CommandName>set</CommandName>
+            <ParameterName>NdRestart_Time</ParameterName>
+            <ParameterValue>200</ParameterValue>
+        </Entry>
+    </Type>
+</Configuration>

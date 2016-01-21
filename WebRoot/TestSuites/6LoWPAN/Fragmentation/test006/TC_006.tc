@@ -1,0 +1,77 @@
+@include /config/globalparam.data
+
+packet Neighbor_Advertisement {
+	header ICMPv6 {
+		ICMP_Type  = 136
+		Code  = 0
+		Message_Body  = [cat 60 00 00 00 $TN_IPv6 02 02 $TN_MAC 00 00 00 00 00 00]
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+		Source_Address  = $TN_IPv6
+		Destination_Address  = $NUT_IPv6
+	}
+	header 6LoWPAN {
+	        Header_Type = LOWPAN_HC1
+	}
+}
+
+packet Echo_Request {
+	header ICMPv6 {
+		ICMP_Type  = 128
+		Code  = 0
+		Message_Body  = [cat 00 00 00 00 \
+		01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01]
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+		Source_Address  = $TN_IPv6
+		Destination_Address  = $NUT_IPv6
+	}
+	header 6LoWPAN {
+	        Header_Type = IPv6
+	}
+}
+
+packet Echo_Request_Fragment {
+	header ICMPv6 {
+		ICMP_Type  = 128
+		Code  = 0
+		Message_Length = 430
+		Message_Body  = [cat 00 11 00 01 ]
+		Mark_Pos = 120
+		Mark_Data = [cat 3e 4f]
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+		Source_Address  = $TN_IPv6
+		Destination_Address  = $NUT_IPv6
+	}
+	header 6LoWPAN {
+	        Header_Type = LOWPAN_HC1
+	}
+}
+
+##############################################################
+# test procedure for test case : TC_006
+##############################################################
+
+create6LoWPAN Echo_Request
+createIPv6 Echo_Request_Fragment
+
+auto_reply_na on
+delay 10
+
+send6LoWPAN Echo_Request
+receive 40 0 <ipv6:6 1 0x3a><icmpv6:0 1 0x81><icmpv6:1 1 0x00>
+
+#use this to test how many fragments it will be
+#send Echo_Request_Fragment
+
+send_frag 1 3 Echo_Request_Fragment
+send_frag 2 3 Echo_Request_Fragment
+send_frag 4 3 Echo_Request_Fragment
+send_frag 5 3 Echo_Request_Fragment
+
+receive 60 1 <icmpv6:0 1 0x81><icmpv6:1 1 0x00><icmpv6:4 4 0x00110001><icmpv6:124 2 0x3e4f>
+

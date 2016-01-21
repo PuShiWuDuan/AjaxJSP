@@ -1,0 +1,94 @@
+
+# include the global parameters
+@include /config/globalparam.data
+
+packet Router_Advertisement_A {
+	header ICMPv6 {
+		ICMP_Type  = 134
+		Code  = 0
+		Message_Body  = [cat 00 00 00 00 00 00 13 88 \
+			       00 00 03 E8 01 02 $TN_MAC 00 00 00 00 00 00]
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+		Hop_Limit  = 255
+	}
+}
+
+packet Router_Advertisement_B {
+	header ICMPv6 {
+		ICMP_Type  = 134
+		Code  = 0
+		Message_Body  = [cat 00 00 00 00 00 00 13 88 \
+			       00 00 03 E8 ]
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+		Hop_Limit  = 255
+	}
+}
+
+packet Neighbor_Advertisement {
+	header ICMPv6 {
+		ICMP_Type  = 136
+		Code  = 0
+		Message_Body  = [cat 60 00 00 00 $TN_IPv6 \
+			        02 02 $TN_MAC 00 00 00 00 00 00]
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+		Hop_Limit  = 255
+	}
+}
+
+packet Echo_Request_A {
+	header ICMPv6 {
+        		ICMP_Type  = 128
+		Code  = 0
+		Message_Body  = [cat 00 11 00 01]
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+	}
+}
+
+##############################################################
+# test procedure for test case : TC_009
+##############################################################
+
+create6LoWPAN Router_Advertisement_A
+create6LoWPAN Router_Advertisement_B
+create6LoWPAN Neighbor_Advertisement
+create6LoWPAN Echo_Request_A
+
+auto_reply_na off
+delay 10
+
+#SLLAO != NULL and neighbor == NULL,create an entry in STALE state
+send6LoWPAN Router_Advertisement_A
+send6LoWPAN Echo_Request_A
+delay 50
+receive 30 0 <icmpv6:0 1 0x87>
+delay 80
+#entry will be deleted
+
+send6LoWPAN Router_Advertisement_B
+#no action
+send6LoWPAN Echo_Request_A
+#create entry in INCOMPLETE, not for a router
+send6LoWPAN Neighbor_Advertisement
+receive 80 0 <icmpv6:0 1 0x81>
+#entry in REACHABLE state
+
+send6LoWPAN Router_Advertisement_A
+send6LoWPAN Echo_Request_A
+receive 80 0 <icmpv6:0 1 0x81>
+#entry in REACHABLE state
+
+delay 450
+send6LoWPAN Echo_Request_A
+#entry in STALE state
+#send6LoWPAN Echo_Request_A
+#delay 50
+receive 80 0 <icmpv6:0 1 0x87>
+delay 50

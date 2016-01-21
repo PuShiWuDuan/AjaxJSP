@@ -1,0 +1,28 @@
+@include /config/globalparam.data
+
+
+packet Echo_Request {
+	header ICMPv6 {
+		ICMP_Type  = 128
+		Code  = 0
+		Message_Body  = [cat 10 10 11 10]
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+	}
+}
+
+
+##############################################################
+# test procedure for test case : TC_001
+##############################################################
+
+create6LoWPAN Echo_Request
+
+info "After the test begin,please restart the DUT"
+
+receive $NdRestart_Time 0 <ipv6:8 8 0x0000000000000000><icmpv6:0 1 0x87><icmpv6:8 16 $NUT_IPv6>
+delay 100
+
+send6LoWPAN Echo_Request
+receive 40 0 <icmpv6:0 1 0x87><icmpv6:8 16 $TN_IPv6><icmpv6:26 8 $NUT_MAC>

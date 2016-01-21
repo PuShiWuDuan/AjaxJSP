@@ -1,0 +1,66 @@
+<?xml version="1.0" standalone="yes"?>
+<!-- ============================================================ -->
+<!-- Conformance Test Case Definition File                        -->
+<!-- ============================================================ -->
+<!-- TestSuite:		IPv6 -->
+<!-- TestGroup:		ICMPv6 -->
+<!-- TestCase:		IPv6ICMPv6Test1 -->
+<!-- Last modified:	2010-10-21 -->
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<!-- Copyright 2010 ICT                                           -->
+<!-- All rights reserved                                          -->
+<!-- ============================================================ -->
+
+<TestCaseDefinition
+	testSuite=			"IPv6"
+	testGroup=			"ICMPv6"
+	testCase=			"IPv6ICMPv6Test6"
+	protocol=			"IPv6"
+	standard=			"RFC4443 RFC2463"
+	standardSections=		"RFC2460 (Section 4) RFC4443 (Section 3.4)"
+	status=				"Mandatory"
+	numberOfTestPorts=		"1"
+	testTopology=			""
+	previousName=			""
+>
+
+	<StandardExtracts>
+	</StandardExtracts>
+
+	<TestDescription>
+		<Item text="Verify when the node receives a packet using global address which parameter is out of range, it should send an ICMP which type should be 4."/>
+		<Item text=""/>
+		<Item detail="yes" text="If an IPv6 node processing a packet finds a problem with a field in the IPv6 header or extension headers such that it cannot complete processing the packet, it MUST discard the packet and SHOULD send an ICMPv6 Parameter Problem message to the packet&apos;s source, indicating the type and location of the problem."/>
+	</TestDescription>
+
+	<TestPurpose>
+	</TestPurpose>
+
+	<Legend>
+	</Legend>
+
+	<Assumptions>
+	</Assumptions>
+
+	<NodeNameMap>
+		<Node id="T1" name="Tester Port 1"/>
+		<Node id="D1" name="DUT Port 1"/>
+	</NodeNameMap>
+
+
+<ExpectedMessageSequence>
+	<Message from="T1" to="D1" msg="Echo_Request" />
+	<Message from="T1" to="D1" msg="Neighbor_Advertisement" />
+	<Message from="T1" to="D1" msg="Echo_Request_unknown_Nextheader" />
+	<Timeout value="2" units="seconds" />
+	<Message from="D1" to="T1" msg="ICMPv6 Error Message:Destination Unreachable Message" />
+</ExpectedMessageSequence>
+
+	<TestPassConditions>
+		<Item text="Whether T1 receive ICMP with type =4, code =1."/>
+	</TestPassConditions>
+
+	<PostTestAction>
+	</PostTestAction>
+
+</TestCaseDefinition>

@@ -1,0 +1,31 @@
+
+# include the global parameters
+@include /config/globalparam.data
+
+packet Neighbor_Solicitation_B {
+	header ICMPv6 {
+		ICMP_Type  = 135
+		Code  = 0
+		Message_Body  = [cat 00 00 00 00 $NUT_IPv6]
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+		Hop_Limit  = 255
+		Source_Address  =$TN_Link 
+		Destination_Address  = $NUT_Solicited
+	}
+}
+
+
+##############################################################
+# test procedure for test case : TC_018
+##############################################################
+
+create6LoWPAN Neighbor_Solicitation_B
+
+auto_reply_na off
+delay 10
+
+send6LoWPAN Neighbor_Solicitation_B
+receive 80 0 <ipv6:24 16 $All_Nodes_multicast_address><icmpv6:0 1 0x88><icmpv6:8 16 $NUT_IPv6> 
+delay 80

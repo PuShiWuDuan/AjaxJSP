@@ -1,0 +1,74 @@
+
+# include the global parameters
+@include /config/globalparam.data
+
+packet Router_Advertisement {
+	header ICMPv6 {
+		ICMP_Type  = 134
+		Code  = 0
+		Message_Body  = [cat 00 00 00 00 00 00 13 88 \
+			       00 00 07 d0 ]
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+		Hop_Limit  = 255
+		Destination_Address  = $All_Nodes_multicast_address
+	}
+}
+
+packet Neighbor_Advertisement {
+	header ICMPv6 {
+		ICMP_Type  = 136
+		Code  = 0
+		Message_Body  = [cat 20 00 00 00 $TN_IPv6 \
+			       02 02 $TN_MAC 00 00 00 00 00 00]
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+		Hop_Limit  = 255
+	}
+}
+
+packet Echo_Request_A {
+	header ICMPv6 {
+        ICMP_Type  = 128   
+		Code  = 0
+		Message_Body  = [cat 00 11 00 01]
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+	}
+}
+
+##############################################################
+# test procedure for test case : TC_021
+##############################################################
+
+create6LoWPAN Router_Advertisement
+create6LoWPAN Neighbor_Advertisement
+create6LoWPAN Echo_Request_A
+
+#info "After the test begin,please restart the DUT"
+
+auto_reply_na off
+delay 10
+
+info "Let DUT delete TN's neighbor cache entry if it exists"
+send6LoWPAN Echo_Request_A
+delay 100
+
+info "Test start..."
+
+#set the retrans_timer=2s
+send6LoWPAN Router_Advertisement
+
+send6LoWPAN Neighbor_Advertisement
+send6LoWPAN Echo_Request_A
+receive 40 0 <icmpv6:0 1 0x87><icmpv6:8 16 $TN_IPv6>
+send6LoWPAN Neighbor_Advertisement
+receive 40 0 <icmpv6:0 1 0x81>
+delay 50
+
+info "Let DUT to delete TN's neighbor cache entry if it eixts"
+send6LoWPAN Echo_Request_A
+delay 100

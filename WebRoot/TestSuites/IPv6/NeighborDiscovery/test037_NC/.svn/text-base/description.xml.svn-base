@@ -1,0 +1,69 @@
+<?xml version="1.0" standalone="yes"?>
+<!-- ============================================================ -->
+<!-- ICT Test Case Definition File                	      -->
+<!-- ============================================================ -->
+<!-- TestSuite:		IPv6 -->
+<!-- TestGroup:		NeighborDiscovery -->
+<!-- TestCase:		IPv6NeighborDiscoveryTest37 -->
+<!-- Last modified:	11-23-2010 -->
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<!-- Copyright 2010 ICT Technologies                          -->
+<!-- All rights reserved                                          -->
+<!-- ============================================================ -->
+
+<TestCaseDefinition
+	testSuite=			"IPv6"
+	testGroup=			"NeighborDiscovery"
+	testCase=			"IPv6NeighborDiscoveryTest37"
+	protocol=			"IPv6"
+	standard=			"RFC4861"
+	standardSections=		"RFC4861 (Section 7.3.3)"
+	status=				"Mandatory"
+>
+
+	<StandardExtracts>
+	</StandardExtracts>
+
+	<TestDescription>
+		<Item text="Verify that a node properly updates its Neighbor Cache from the Stale state upon the receipt of a Neighbor Advertisement."/>
+		<Item text=""/>
+		<Item detail="yes" text="When a Neighbor Cache entry is in the Stale state, the receipt of a Neighbor Advertisement causes the state of the entry to change as follows, based upon the Solicited and Override flags of the advertisement, and whether the link-layer address is equal to the previously cached value."/>
+	</TestDescription>
+
+	<TestPurpose>
+	</TestPurpose>
+
+	<Legend>
+	</Legend>
+
+	<Assumptions>
+	</Assumptions>
+
+	<NodeNameMap>
+		<Node id="T1" name="Tester Port 1"/>
+		<Node id="D1" name="DUT Port 1"/>
+	</NodeNameMap>
+
+
+<ExpectedMessageSequence>
+	<Heading text="Clear T1 buffer" />
+	<Message from="T1" to="D1" msg="Echo_Request" />
+	<Message from="T1" to="D1" msg="Neighbor_Advertisement" />
+	<Heading text="Delay 45 seconds" />
+	<Message from="T1" to="D1" msg="Neighbor_Advertisement_C" />
+	<Heading text="Clear T1 buffer" />
+	<Message from="T1" to="D1" msg="Echo_Request" />
+	<Heading text="Delay 5 seconds" />
+	<Timeout value="3" units="seconds" />
+	<Message from="D1" to="T1" msg="Neighbor Solicitation Message" />
+	<Heading text="Delay 8 seconds" />
+</ExpectedMessageSequence>
+
+	<TestPassConditions>
+		<Item text="Just wait and see if T1 can receive a N_S. If so, then pass."/>
+	</TestPassConditions>
+
+	<PostTestAction>
+	</PostTestAction>
+
+</TestCaseDefinition>

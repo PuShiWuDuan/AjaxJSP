@@ -1,0 +1,69 @@
+<?xml version="1.0" standalone="yes"?>
+<!-- ============================================================ -->
+<!-- ICT Conformance Test Case Definition File                -->
+<!-- ============================================================ -->
+<!-- TestSuite:		6LoWPAN -->
+<!-- TestGroup:		Fragment -->
+<!-- TestCase:		FragmentTest3 -->
+<!-- Last modified:	10-22-2010 -->
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<!-- Copyright 2010 ICT Technologies                          -->
+<!-- All rights reserved                                          -->
+<!-- ============================================================ -->
+
+<TestCaseDefinition
+	testSuite=		"6LoWPAN"
+	testGroup=		"Fragmentation"
+	testCase=			"FragmentationTest3"
+	protocol=			"6LoWPAN"
+	standard=			"RFC4944"
+	standardSections=		"RFC4944 (Section 5.3)"
+>
+
+	<StandardExtracts>
+	</StandardExtracts>
+
+	<TestDescription>
+		<Item text="Verify the node could properly handle the 6lowpan fragmentation overlap."/>
+		<Item text=""/>
+		<Item detail="yes" text="If a link fragment that overlaps another fragment is received, and differs in either the size or datagram_offset of the overlapped fragment, the fragments(s) already accumulated in the reassembly buffer SHALL be discarded."/>
+	</TestDescription>
+
+	<TestPurpose>
+	</TestPurpose>
+
+	<Legend>
+	</Legend>
+
+	<Assumptions>
+	</Assumptions>
+
+	<NodeNameMap>
+		<Node id="T1" name="Tester Port 1"/>
+		<Node id="D1" name="DUT Port 1"/>
+	</NodeNameMap>
+
+
+<ExpectedMessageSequence>
+	<Message from="T1" to="D1" msg="Echo_Request" />
+	<Message from="D1" to="T1" msg="ICMPv6 Information Message: Echo Reply Message" />
+	<Message from="T1" to="D1" msg="Echo_Request_Fragment1" />
+	<Message from="T1" to="D1" msg="Echo_Request_Fragment3" />
+	<Message from="T1" to="D1" msg="Echo_Request_Fragment2" />
+	<Message from="T1" to="D1" msg="Echo_Request_Fragment4" />
+	<Message from="T1" to="D1" msg="Echo_Request_Fragment2(different offset)" />
+	<Message from="T1" to="D1" msg="Echo_Request_Fragment5" />
+	<Timeout value="6" units="seconds" />
+	<ExceptionGroup title="Unexpected Packet">
+		<Message from="D1" to="T1" msg="ICMPv6 Information Message: Echo Reply Message" />
+	</ExceptionGroup>
+</ExpectedMessageSequence>
+
+	<TestPassConditions>
+		<Item text="Just wait and see if the DUT&apos;ll response with another ICMP response packet (type 129). If false, then verdict that the DUT passes this test, otherwise, verdict that the DUT behaves wrong in this test."/>
+	</TestPassConditions>
+
+	<PostTestAction>
+	</PostTestAction>
+
+</TestCaseDefinition>

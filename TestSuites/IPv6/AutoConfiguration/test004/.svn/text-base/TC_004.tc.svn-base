@@ -1,0 +1,106 @@
+
+# include the global parameters
+@include /config/globalparam.data
+
+
+packet Neighbor_Advertisement_1 {
+	header ICMPv6 {
+		ICMP_Type  = 136
+		Code  = 0
+		Message_Body  = [cat 20 00 00 00 $NUT_IPv6\
+				02 02 $NUT_MAC 00 00 00 00 00 00]
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+		Hop_Limit  = 255
+		Source_Address  = $NUT_IPv6
+		Destination_Address  = $All_Nodes_multicast_address
+	}
+}
+
+packet Neighbor_Advertisement_2 {
+	header ICMPv6 {
+		ICMP_Type  = 136
+		Code  = 0
+		Message_Body  = [cat 20 00 00 00 $AUTO_2\
+				 02 02 $NUT_MAC 00 00 00 00 00 00]
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+		Hop_Limit  = 255
+		Source_Address  = $AUTO_2
+		Destination_Address  =$All_Nodes_multicast_address
+	}
+}
+
+
+packet Echo_Request {
+	header ICMPv6 {
+		ICMP_Type  = 128  
+		Code  = 0
+		Message_Body  = [cat 10 10 11 10]
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+	}
+}
+
+packet Router_Advertisement {
+	header ICMPv6 {
+		ICMP_Type  = 134
+		Code  = 0
+		Message_Body  = [cat 80 00 00 c8  00 05 7e 40\
+				 00 00 03 e8  03 04 40 c0\
+				 00 00 00 12  00 00 00 12\
+				 00 00 00 00  $RA_prefix]
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+		Hop_Limit  = 255
+		Destination_Address  =$All_Nodes_multicast_address 
+	}
+}
+
+packet Neighbor_Solicitation {
+	header ICMPv6 {
+		ICMP_Type  = 135
+		Code  = 0
+		Message_Body  = [cat 00 00 00 00 $AUTO_2\
+				01 02 $TN_MAC 00 00 00 00 00 00]
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+		Hop_Limit  = 255
+		Destination_Address  = $NUT_Solicited 
+	}
+}
+
+##############################################################
+# test procedure for test case : TC_004
+##############################################################
+
+create6LoWPAN Neighbor_Advertisement_1
+create6LoWPAN Neighbor_Advertisement_2
+create6LoWPAN Echo_Request
+create6LoWPAN Router_Advertisement
+create6LoWPAN Neighbor_Solicitation
+
+info "After the test begin,please restart the DUT"
+
+#link-local auto-config failed
+receive $NdRestart_Time 0 <ipv6:8 8 0x0000000000000000><icmpv6:0 1 0x87><icmpv6:8 16 $NUT_IPv6>
+send6LoWPAN Neighbor_Advertisement_1
+delay 100
+send6LoWPAN Echo_Request
+receive 20 1 <icmpv6:0 1 0x87><icmpv6:8 16 $TN_IPv6><icmpv6:26 8 $NUT_MAC>
+
+send6LoWPAN Router_Advertisement
+#NUT send NS for DAD after receive a RA
+receive 40 0 <icmpv6:0 1 0x87><icmpv6:8 16 $AUTO_2>
+#TN send NA to tell NUT that the address has been used
+send6LoWPAN Neighbor_Advertisement_2
+
+delay 40
+#Test if the NUT has the global address
+send6LoWPAN Neighbor_Solicitation
+receive 20 1 <icmpv6:0 1 0x88><icmpv6:8 16 $AUTO_2>

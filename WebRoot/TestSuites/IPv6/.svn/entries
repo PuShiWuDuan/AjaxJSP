@@ -1,0 +1,40 @@
+10
+
+dir
+11
+https://server/svn/IPSOTest/IPSO_GUI/trunk/TestSuites/IPv6
+https://server/svn/IPSOTest
+
+
+
+2014-11-03T03:19:09.101380Z
+11
+nhjnthl
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+31f1682b-156c-5246-99e1-7b9dac2023f3
+
+AutoConfiguration
+dir
+
+Addressing
+dir
+
+ICMPv6
+dir
+
+NeighborDiscovery
+dir
+

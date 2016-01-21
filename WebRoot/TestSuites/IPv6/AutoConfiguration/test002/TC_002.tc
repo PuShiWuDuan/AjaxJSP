@@ -1,0 +1,48 @@
+
+@include /config/globalparam.data
+
+packet Neighbor_Advertisement {
+	header ICMPv6 {
+		ICMP_Type  = 136
+		Code  = 0
+		Message_Body  = [cat 20 00 00 00 $NUT_IPv6\
+				02 02 $NUT_MAC 00 00 00 00 00 00]
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+		Hop_Limit  = 255
+		Source_Address  = $NUT_IPv6
+		Destination_Address  = $All_Nodes_multicast_address
+	}
+}
+
+
+packet Echo_Request {
+	header ICMPv6 {
+		ICMP_Type  = 128
+		Code  = 0
+		Message_Body  = [cat 10 10 11 10]
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+	}
+}
+
+##############################################################
+# test procedure for test case : TC_002
+##############################################################
+
+create6LoWPAN Neighbor_Advertisement
+createIPv6 Echo_Request
+
+info "After the test begin,please restart the DUT"
+
+#addrconf Neighbor_Advertisement
+#delay 50
+receive $NdRestart_Time 0 <ipv6:8 8 0x0000000000000000><icmpv6:0 1 0x87><icmpv6:8 16 $NUT_IPv6>
+send6LoWPAN Neighbor_Advertisement
+
+delay 100
+
+send Echo_Request
+receive 40 0 <icmpv6:0 1 0x87><icmpv6:8 16 $TN_IPv6><icmpv6:26 8 $NUT_MAC>

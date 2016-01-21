@@ -1,0 +1,61 @@
+@include /config/globalparam.data
+
+packet Neighbor_Advertisement {
+	header ICMPv6 {
+		ICMP_Type  = 136
+		Code  = 0
+		Message_Body  = [cat 60 00 00 00 $TN_IPv6 02 02 $TN_MAC 00 00 00 00 00 00]
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+		Source_Address  = $TN_IPv6
+		Destination_Address  = $NUT_IPv6
+	}
+	header 6LoWPAN {
+	        Header_Type = LOWPAN_HC1
+	}
+}
+
+packet Echo_Request {
+	header ICMPv6 {
+		ICMP_Type  = 128
+		Code  = 0
+		Message_Body  = [cat 00 00 00 00 \
+		01 01 01 01 01 01 01 01 01 01 01 01 01 01 01 01]
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+		Source_Address  = $TN_IPv6
+		Destination_Address  = $NUT_IPv6
+	}
+	header 6LoWPAN {
+	        Header_Type = IPv6
+	}
+}
+
+set Src_Multicast_IPv6 FF02::1
+packet Neighbor_Solicitation {
+	header ICMPv6 {
+		ICMP_Type  = 135
+		Code  = 0
+		Message_Body  = [cat 00 00 00 00 $NUT_IPv6 02 02 $TN_MAC 00 00 00 00 00 00]
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+		Source_Address  = $Src_Multicast_IPv6
+	}
+}
+
+create6LoWPAN Neighbor_Advertisement
+create6LoWPAN Echo_Request
+create6LoWPAN Neighbor_Solicitation
+
+auto_reply_na on
+delay 10
+
+send6LoWPAN Echo_Request
+#send6LoWPAN Neighbor_Advertisement
+receive 40 0 <icmpv6:0 1 0x81>
+
+send6LoWPAN Neighbor_Solicitation
+receive 40 1 <icmpv6:0 1 0x88><icmpv6:8 16 $NUT_IPv6>

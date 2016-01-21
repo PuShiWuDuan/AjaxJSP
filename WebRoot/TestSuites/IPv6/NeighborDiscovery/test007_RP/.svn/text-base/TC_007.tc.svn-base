@@ -1,0 +1,107 @@
+
+# include the global parameters
+@include /config/globalparam.data
+
+packet Router_Advertisement_1 {
+	header ICMPv6 {
+		ICMP_Type  = 134
+		Code  = 0
+		Message_Body  = [cat 00 00 00 07 00 00 13 88 \
+			         00 00 03 e8]
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+		Hop_Limit  = 255
+	}
+}
+
+packet Neighbor_Advertisement {
+	header ICMPv6 {
+		ICMP_Type  = 136
+		Code  = 0
+		Message_Body  = [cat e0 00 00 00 $TN_IPv6 \
+			       02 02 $TN_MAC 00 00 00 00 00 00]
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+		Hop_Limit  = 255
+	}
+}
+
+packet Router_Advertisement_0 {
+	header ICMPv6 {
+		ICMP_Type  = 134
+		Code  = 0
+		Message_Body  = [cat 00 00 00 00 00 00 13 88 \
+			       00 00 03 e8 01 01 $TN_MAC ]
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+		Hop_Limit  = 255
+	}
+}
+
+packet Echo_Request_A {
+	header ICMPv6 {
+        		ICMP_Type  = 128
+		Code  = 0
+		Message_Body  = [cat 00 11 00 01]
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+		Source_Address  =$TN_ND_global
+	}
+}
+
+#for delete cache entry
+packet Echo_Request_Entry {
+	header ICMPv6 {
+		ICMP_Type  = 128
+		Code  = 0
+		Message_Body  = [cat 00 11 00 01]
+	}
+	header IPv6 {
+		Next_Header = $ICMPv6
+	}
+}
+##############################################################
+# test procedure for test case : TC_007
+##############################################################
+
+create6LoWPAN Router_Advertisement_1
+create6LoWPAN Neighbor_Advertisement
+create6LoWPAN Router_Advertisement_0
+create6LoWPAN Echo_Request_A
+create6LoWPAN Echo_Request_Entry
+
+auto_reply_na off
+delay 10
+
+#Router Lifetime = 5s,create a router
+send6LoWPAN Router_Advertisement_1
+send6LoWPAN Echo_Request_A
+send6LoWPAN Neighbor_Advertisement
+receive 30 0 <icmpv6:0 1 0x81>
+delay 20
+#Reset the timer to new value
+send6LoWPAN Router_Advertisement_1
+delay 30
+send6LoWPAN Echo_Request_A
+receive 30 0 <icmpv6:0 1 0x81>
+delay 20
+#router is deleted
+
+#create a new entry
+send6LoWPAN Router_Advertisement_1
+send6LoWPAN Echo_Request_A
+receive 30 0 <icmpv6:0 1 0x81>
+#timeout the router immediately
+send6LoWPAN Router_Advertisement_0
+send6LoWPAN Echo_Request_A
+send6LoWPAN Neighbor_Advertisement
+receive 40 1 <icmpv6:0 1 0x81>
+delay 80
+
+info "Let DUT delete the neighbor cache entry if it exists"
+send6LoWPAN Echo_Request_Entry 1
+delay 100

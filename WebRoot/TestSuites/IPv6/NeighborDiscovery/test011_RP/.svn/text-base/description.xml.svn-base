@@ -1,0 +1,65 @@
+<?xml version="1.0" standalone="yes"?>
+<!-- ============================================================ -->
+<!-- ICT Test Case Definition File                	      -->
+<!-- ============================================================ -->
+<!-- TestSuite:		IPv6 -->
+<!-- TestGroup:		NeighborDiscovery -->
+<!-- TestCase:		IPv6NeighborDiscoveryTest11 -->
+<!-- Last modified:	11-18-2010 -->
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<!-- Copyright 2010 ICT Technologies                          -->
+<!-- All rights reserved                                          -->
+<!-- ============================================================ -->
+
+<TestCaseDefinition
+	testSuite=			"IPv6"
+	testGroup=			"NeighborDiscovery"
+	testCase=			"IPv6NeighborDiscoveryTest11"
+	protocol=			"IPv6"
+	standard=			"RFC4861"
+	standardSections=		"RFC4861 (Section 6.3.4, 6.3.5)"
+	status=				"Mandatory"
+>
+
+	<StandardExtracts>
+	</StandardExtracts>
+
+	<TestDescription>
+		<Item text="Verify when the prefix is not present in Prefix List, the host can properly update its Prefix List upon the receipt of Router Advertisement with Prefix Information Options in which Valid Lifetime is set to non-zero."/>
+		<Item text=""/>
+		<Item detail="yes" text="If the prefix is not already present in the Prefix List (PL), and the Prefix Information option&apos;s Valid Lifetime field is non-zero, create a new entry for the prefix and initialize its invalidation timer to the Valid Lifetime value in the Prefix Information option."/>
+		<Item detail="yes" text="If the prefix is already present in the host&apos;s Prefix List as the result of a previously received advertisement, reset its invalidation timer to the Valid Lifetime value in the Prefix Information option. If the new Lifetime value is zero, it should timeout the prefix immediately (see Section 6.3.5)."/>
+		<Item detail="yes" text="If the Prefix Information option&apos;s Valid Lifetime field is zero, and the prefix is not present in the host&apos;s Prefix List, silently ignore the option."/>
+	</TestDescription>
+
+	<TestPurpose>
+	</TestPurpose>
+
+	<Legend>
+	</Legend>
+
+	<Assumptions>
+	</Assumptions>
+
+	<NodeNameMap>
+		<Node id="T1" name="Tester Port 1"/>
+		<Node id="D1" name="DUT Port 1"/>
+	</NodeNameMap>
+
+
+<ExpectedMessageSequence>
+	<Message from="T1" to="D1" msg="Router_Advertisement" />
+	<Message from="T1" to="D1" msg="Echo_Request_A" />
+	<Timeout value="8" units="seconds" />
+	<Message from="D1" to="T1" msg="Neighbor Solicitation Message" />
+	<Heading text="Delay 45 seconds" />
+</ExpectedMessageSequence>
+
+	<TestPassConditions>
+		<Item text="Verify if T1 can receive a N_S with the global address being its target address from DUT, if so, then pass."/>
+	</TestPassConditions>
+
+	<PostTestAction>
+	</PostTestAction>
+
+</TestCaseDefinition>

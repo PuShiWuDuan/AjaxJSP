@@ -1,0 +1,19 @@
+####    MAC Address    ####
+mac_address TN_MAC 02:12:13:ff:fe:14:15:11
+mac_address NUT_MAC 02:11:22:ff:fe:33:44:50
+mac_address Mac_Other_1 00:12:74:00:12:e6:a4:85
+####    Link Local Adress    ####
+ipv6_address TN_IPv6 fe80::12:13ff:fe14:1511
+ipv6_address NUT_IPv6 fe80::11:22ff:fe33:4450
+ipv6_address Link_Local_Other_1 fe80::212:7400:12e6:1438
+ipv6_address Link_Local_Other_2 fe80::212:7400:12e6:1539
+####    Global IPv6 Address and Prefix    ####
+ipv6_address Global_Prefix aaaa::0
+ipv6_address IPv6Global_T1 aaaa::12:13ff:fe14:1511
+ipv6_address IPv6Global_D1 aaaa::11:22ff:fe33:4450
+ipv6_address Global_Other_Prefix abcd::0
+ipv6_address Global_Other_1 abcd::212:e500:874a:b34f
+ipv6_address Global_Other_2 abcd::212:e700:9740:56df
+####        ####
+####    Time Set    ####
+set NdRestart_Time 200

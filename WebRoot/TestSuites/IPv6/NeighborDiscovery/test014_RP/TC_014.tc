@@ -1,0 +1,51 @@
+
+# include the global parameters
+@include /config/globalparam.data
+
+packet Router_Advertisement {
+	header ICMPv6 {
+		ICMP_Type  = 134
+		Code  = 0
+		Message_Body  = [cat 00 00 00 08 00 00 13 88 \
+			       00 00 03 e8 03 04 40 c0 \
+			       00 00 00 02 00 00 00 02 \
+			       00 00 00 00 $RA_prefix]
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+		Hop_Limit  = 255
+		Destination_Address  =$All_Nodes_multicast_address 
+	}
+}
+
+packet Echo_Request_A {
+	header ICMPv6 {
+        		ICMP_Type  = 128
+		Code  = 0
+		Message_Body  = [cat 00 11 00 01]
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+		Source_Address  = $TN_ND_global
+	}
+}
+
+##############################################################
+# test procedure for test case : TC_014
+##############################################################
+
+create6LoWPAN Router_Advertisement
+create6LoWPAN Echo_Request_A
+
+auto_reply_na off
+delay 10
+
+send6LoWPAN Router_Advertisement
+send6LoWPAN Echo_Request_A
+receive 40 0 <icmpv6:0 1 0x87><icmpv6:8 16 $TN_ND_global>
+delay 20
+
+send6LoWPAN Echo_Request_A
+receive 40 0 <icmpv6:0 1 0x87><icmpv6:8 16 $TN_IPv6>
+
+delay 50

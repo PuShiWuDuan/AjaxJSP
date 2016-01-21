@@ -1,0 +1,21 @@
+####    MAC Address    ####
+mac_address USB14_MAC 02:12:13:ff:fe:14:15:14
+mac_address USB15_MAC 02:12:13:ff:fe:14:15:15
+mac_address USB16_MAC 02:12:13:ff:fe:14:15:16
+mac_address USB17_MAC 02:12:13:ff:fe:14:15:17
+
+mac_address N59_MAC 02:11:22:ff:fe:33:44:59
+mac_address N54_MAC 02:11:22:ff:fe:33:44:54
+mac_address N55_MAC 02:11:22:ff:fe:33:44:55
+mac_address N56_MAC 02:11:22:ff:fe:33:44:56
+
+####    Link Local Adress    ####
+ipv6_address USB14_IPv6 fe80::12:13ff:fe14:1514
+ipv6_address USB15_IPv6 fe80::12:13ff:fe14:1515
+ipv6_address USB16_IPv6 fe80::12:13ff:fe14:1516
+ipv6_address USB17_IPv6 fe80::12:13ff:fe14:1517
+
+ipv6_address N59_IPv6 fe80::11:22ff:fe33:4459
+ipv6_address N54_IPv6 fe80::11:22ff:fe33:4454
+ipv6_address N55_IPv6 fe80::11:22ff:fe33:4455
+ipv6_address N56_IPv6 fe80::11:22ff:fe33:4456

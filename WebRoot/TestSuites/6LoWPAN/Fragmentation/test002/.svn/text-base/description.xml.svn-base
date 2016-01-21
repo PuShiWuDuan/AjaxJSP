@@ -1,0 +1,63 @@
+<?xml version="1.0" standalone="yes"?>
+<!-- ============================================================ -->
+<!-- ICT Conformance Test Case Definition File                -->
+<!-- ============================================================ -->
+<!-- TestSuite:		6LoWPAN -->
+<!-- TestGroup:		Fragment -->
+<!-- TestCase:		FragmentTest2 -->
+<!-- Last modified:	10-22-2010 -->
+<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+<!-- Copyright 2010 ICT Technologies                          -->
+<!-- All rights reserved                                          -->
+<!-- ============================================================ -->
+
+<TestCaseDefinition
+	testSuite=		"6LoWPAN"
+	testGroup=		"Fragmentation"
+	testCase=			"FragmentationTest2"
+	protocol=			"6LoWPAN"
+	standard=			"RFC4944"
+	standardSections=		"RFC4944 (Section 5.3)"
+>
+
+	<StandardExtracts>
+	</StandardExtracts>
+
+	<TestDescription>
+		<Item text="Verify the node could properly handle the 6lowpan fragmentation."/>
+		<Item text=""/>
+		<Item detail="yes" text="A node is required to reassemble all the fragment and response the right packet.The encoding type in 6lowpan is HC1."/>
+	</TestDescription>
+
+	<TestPurpose>
+	</TestPurpose>
+
+	<Legend>
+	</Legend>
+
+	<Assumptions>
+	</Assumptions>
+
+	<NodeNameMap>
+		<Node id="T1" name="Tester Port 1"/>
+		<Node id="D1" name="DUT Port 1"/>
+	</NodeNameMap>
+
+
+<ExpectedMessageSequence>
+	<Message from="T1" to="D1" msg="Echo_Request" />
+	<Message from="T1" to="D1" msg="Neighbor_Advertisement" />
+	<Message from="T1" to="D1" msg="Echo_Request_Fragment1" />
+	<Message from="T1" to="D1" msg="Echo_Request_FragmentN" />
+	<Timeout value="6" units="seconds" />
+	<Message from="D1" to="T1" msg="ICMPv6 Information Message: Echo Reply Message" />
+</ExpectedMessageSequence>
+
+	<TestPassConditions>
+		<Item text="Just wait and see if the DUT&apos;ll response with another ICMP response packet (type 129). If true, then verdict that the DUT passes this test, otherwise, verdict that the DUT behaves wrong in this test."/>
+	</TestPassConditions>
+
+	<PostTestAction>
+	</PostTestAction>
+
+</TestCaseDefinition>

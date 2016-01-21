@@ -1,35 +1,30 @@
 $(document).ready(function() {
-	var chosed;
-    var o=[];
+	var chose="";
+	var div=[];
+   
 	$('#btnShow').click(function() {
+		$("div.checkbox").each(function(){
+			var value = $(this).attr("value");
+			if(value!=0)div.push(value);
+		});
+		$("div.checkbox").find(div).hide();
 		var data = [];
 		$('input[name="Fruit"]:checked').each(function() {
 		  // $('.col-md-8').text(this.value);
-		   chosed = this.value;
-		   data.push({checkboxGroup:chosed});
+		   chose = this.value;
+		   alert(chose);
+		   data.push({checkboxGroup:chose});
 		});
 		//alert(data);
 		$.ajax({
 			type:"POST",
-			url : 'GetUserServlet',
-			data :{chosed:chosed},
+			url : 'GetTestResultServlet',
+			data :{chosed:chose},
 			success : function(responseText) {
-				var finishtime=new Date();
-	           // timediff=finishtime.getTime()-inittime.getTime();
+				//alert("ok");
 				$('#row').html(responseText);
 				$.parser.parse($("#row")); 
-			}
-		});
-	});
-	$('#userName').blur(function() {
-		$.ajax({
-			type:"POST",
-			url : 'GetUserServlet',
-			data : {
-				userName : $('#userName').val()
-			},
-			success : function(responseText) {
-				$('#ajaxGetUserServletResponse').text(responseText);
+				//alert("ok");
 			}
 		});
 	});

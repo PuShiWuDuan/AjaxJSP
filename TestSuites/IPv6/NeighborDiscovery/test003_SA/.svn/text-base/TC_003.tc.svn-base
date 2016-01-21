@@ -1,0 +1,53 @@
+
+# include the global parameters
+@include /config/globalparam.data
+
+
+packet Router_Advertisement {
+	header ICMPv6 {
+		ICMP_Type  = 134
+		Code  = 0
+		Message_Body  = [cat ff 00 00 08 00 00 13 88 \
+			       00 00 00 00 03 04 40 c0 \
+			       00 00 00 08 00 00 00 08 \
+			       00 00 00 00 $RA_prefix ]
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+		Hop_Limit  = 255
+		Destination_Address  = $All_Nodes_multicast_address
+	}
+}
+
+ipv6_address TN_ND_global_wrong abcd::212:e500:874a:b34f
+packet Echo_Request_WrongPrefix {
+	header ICMPv6 {
+		ICMP_Type  = 128
+		Code  = 0
+		Message_Body  = [cat 00 11 00 01]
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+		Source_Address  = $TN_ND_global_wrong
+		Destination_Address  = $NUT_Global
+	}
+}
+
+
+
+##############################################################
+# test procedure for test case : TC_003
+##############################################################
+
+create6LoWPAN Router_Advertisement
+create6LoWPAN Echo_Request_WrongPrefix
+
+auto_reply_na off
+delay 10
+
+send6LoWPAN Router_Advertisement
+#wait for a while
+delay 30
+send6LoWPAN Echo_Request_WrongPrefix
+receive 40 0 <icmpv6:0 1 0x87><icmpv6:8 16 $TN_IPv6>
+delay 80

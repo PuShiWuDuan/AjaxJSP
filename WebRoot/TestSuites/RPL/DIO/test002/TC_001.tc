@@ -1,0 +1,53 @@
+@include /config/globalparam.data
+
+packet DIS {
+	header ICMPv6 {
+		ICMP_Type  = 155
+		Code  = 0
+		Message_Body = [ cat 1e f2]
+		Mark_Pos = 46
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+		Source_Address  = $TN_IPv6
+		#Destination_Address  = $RPL_multicast_address
+	}
+	header 6LoWPAN {
+		#Header_Type = IPv6
+		#Dest_Mac_Address = $Mac_Multicast
+	}
+}
+
+packet DIO {
+	header DIO {
+		Instance_Id = 20
+   		Version = 242
+   		Rank = 256
+   		Gounded = 0
+   		Mop = 2
+   		Dag_Id = 11 
+		Interval_Doublings = 8
+    		Interval_Min = 12
+   		Redundancy_Constant = 10
+   		Max_Rank_Inc = 1792
+   		Min_Hop_Rank_Inc = 256
+		Default_Lifetime = 255
+		Lifetime_Unit = 65535
+   		Prefix = RPL_Prefix
+		Destination_Address = $RPL_multicast_address
+	}
+}
+
+createRPL DIO
+
+create6LoWPAN DIS
+auto_reply_na on
+delay 10
+
+sendRPL DIO
+
+delay 100
+
+send6LoWPAN DIS
+receive 100 0 <icmpv6:0 1 0x9b>
+

@@ -1,0 +1,75 @@
+
+# include the global parameters
+@include /config/globalparam.data
+
+packet Router_Advertisement_1 {
+	header ICMPv6 {
+		ICMP_Type  = 134
+		Code  = 0
+		Message_Body  = [cat 00 00 00 00 00 00 13 88 \
+			       00 00 03 e8 ]
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+		Hop_Limit  = 255
+		Destination_Address  = $All_Nodes_multicast_address
+	}
+}
+
+packet Router_Advertisement_5 {
+	header ICMPv6 {
+		ICMP_Type  = 134
+		Code  = 0
+		Message_Body  = [cat 00 00 00 00 00 00 3a 98 \
+			       00 00 13 88]
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+		Hop_Limit  = 255
+		Destination_Address  = $All_Nodes_multicast_address
+	}
+}
+
+packet Echo_Request_A {
+	header ICMPv6 {
+        ICMP_Type  = 128   
+		Code  = 0
+		Message_Body  = [cat 00 11 00 01]
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+	}
+}
+
+##############################################################
+# test procedure for test case : TC_016
+##############################################################
+
+create6LoWPAN Router_Advertisement_1
+create6LoWPAN Router_Advertisement_5
+create6LoWPAN Echo_Request_A
+
+auto_reply_na off
+delay 10
+
+info "Let DUT delete TN's neighbor cache entry if it exists"
+send6LoWPAN Echo_Request_A
+delay 100
+
+info "Test start..."
+
+send6LoWPAN Router_Advertisement_1
+send6LoWPAN Echo_Request_A
+receive 10 0 <icmpv6:0 1 0x87><icmpv6:8 16 $TN_IPv6>
+#delay 10
+receive 10 0 <icmpv6:0 1 0x87><icmpv6:8 16 $TN_IPv6>
+#delay 10
+receive 10 0 <icmpv6:0 1 0x87><icmpv6:8 16 $TN_IPv6>
+delay 50
+send6LoWPAN Router_Advertisement_5
+send6LoWPAN Echo_Request_A
+receive 50 0 <icmpv6:0 1 0x87><icmpv6:8 16 $TN_IPv6>
+#delay 40
+receive 50 0 <icmpv6:0 1 0x87><icmpv6:8 16 $TN_IPv6>
+#delay 40
+receive 50 0 <icmpv6:0 1 0x87><icmpv6:8 16 $TN_IPv6>

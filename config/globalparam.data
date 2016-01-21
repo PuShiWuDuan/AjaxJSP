@@ -1,0 +1,78 @@
+@include /config/config.data
+
+################################################################
+################ Header  Types  ######################
+################################################################
+set ICMPv6 58
+set IP 4
+set TCP 6
+
+proc LinkLocalToSolicited {LinkLocal} {
+    set s1 "ff0200000000000000000001ff"
+    set s2 [string range $LinkLocal 26 31]
+    return [append s1 $s2]
+}
+mac_address Mac_Multicast 00:00:00:00:00:00:00:00
+
+###############generally used addresses and prefixes  ################################
+ipv6_address All_Nodes_multicast_address ff02::1
+ipv6_address RPL_multicast_address ff02::1a
+ipv6_address TN_Link ::
+
+ipv6_address RPL_Prefix bbbb::0
+ipv6_address TN_AUTO_prefix fe80::0
+ipv6_address TN_AUTO_prefix1 fec0::0
+
+#set TN_IPv6 		[MacToLinkLocal $TN_MAC]
+#set NUT_IPv6 		[MacToLinkLocal $NUT_MAC]
+set TN_Global 	$IPv6Global_T1
+set NUT_Global 	$IPv6Global_D1
+
+set NUT_Solicited [LinkLocalToSolicited $NUT_IPv6]
+
+################################################################
+####address used by Address Test Cases
+################################################################
+
+#address used by ICMPv6
+set ICMPv6_TN_Global $IPv6Global_T1
+set ICMPv6_NUT_Global $IPv6Global_D1
+
+#Neighbor discovery
+set TN_ND_global $TN_Global
+set TN_ND_global_1 $Global_Other_1
+set TN_ND_global_2 $Global_Other_2
+set RA_prefix $Global_Prefix
+set RA_prefix1 $Global_Other_Prefix
+set ND_Source_Address1 $Link_Local_Other_1
+set ND_Source_Address2 $Link_Local_Other_2  
+set ND_NA_MAC $Mac_Other_1
+
+#Auto-Config
+set AUTO_1 $IPv6Global_T1
+set AUTO_2 $IPv6Global_D1
+
+###[Defualt Header]
+default IPv6 {
+    Version = 6
+    Traffic_Class = 0
+    Flow_Label = 0
+    Payload_Length = 0
+    Next_Header = $ICMPv6
+    Hop_Limit = 255
+    Source_Address = $TN_IPv6
+    Destination_Address = $NUT_IPv6
+}
+
+
+default ICMPv6 {
+    Code = 0
+    Checksum = 0
+    Message_Length = 0
+}
+
+default 6LoWPAN {
+    Dest_Mac_Address = $NUT_MAC
+    Src_Mac_Address = $TN_MAC
+    Header_Type = LOWPAN_HC1
+}

@@ -1,0 +1,61 @@
+
+# include the global parameters
+@include /config/globalparam.data
+
+packet Neighbor_Solicitation_A {
+	header ICMPv6 {
+		ICMP_Type  = 135
+		Code  = 0
+		Message_Body  = [cat 00 00 00 00 $All_Nodes_multicast_address 
+				01 02 $TN_MAC 00 00 00 00 00 00]
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+		Hop_Limit  = 255
+	}
+}
+
+packet Neighbor_Advertisement {
+	header ICMPv6 {
+		ICMP_Type  = 136
+		Code  = 0
+		Message_Body  = [cat 60 00 00 00 $TN_IPv6 02 02 $TN_MAC 00 00 00 00 00 00]
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+		#Source_Address  = $TN_Global
+		#Destination_Address  = $NUT_Global
+	}
+}
+
+packet Echo_Request {
+	header ICMPv6 {
+		ICMP_Type  = 128
+		Code  = 0
+		Message_Body  = [cat 00 11 00 01]
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+		#Source_Address  = $TN_Global
+		#Destination_Address  = $NUT_Global
+	}
+}
+
+##############################################################
+# test procedure for test case : TC_017
+##############################################################
+
+create6LoWPAN Neighbor_Solicitation_A
+create6LoWPAN Neighbor_Advertisement
+create6LoWPAN Echo_Request
+
+auto_reply_na off
+delay 10
+
+send6LoWPAN Echo_Request
+send6LoWPAN Neighbor_Advertisement
+send6LoWPAN Echo_Request
+receive 20 0 <icmpv6:0 1 0x81>
+send6LoWPAN Neighbor_Solicitation_A
+receive 40 1 <icmpv6:0 1 0x88>
+delay 80

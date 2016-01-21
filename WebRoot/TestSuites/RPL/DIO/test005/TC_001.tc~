@@ -1,0 +1,79 @@
+@include /config/globalparam.data
+
+packet Neighbor_Advertisement {
+	header ICMPv6 {
+		ICMP_Type  = 155
+		Code  = 1
+		Message_Body = [ cat 1e f2 01 00 10 fc \
+00 00 11 11 00 11 00 00 00 00 00 00 00 00 00 00 11 00 02 \
+06 07 04 00 02 00 00 04 0e 00 08 0c 0a 07 00 01 00 00 01 \
+00 ff ff ff 08 1e 40 40 00 00 00 00 00 00 00 00 00 00 00 \
+00 bb bb 00 00 00 00 00 00 00 00 00 00 00 00 00 00]
+		Mark_Pos = 46
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+		Source_Address  = $TN_IPv6
+		#Destination_Address  = $RPL_multicast_address
+	}
+	header 6LoWPAN {
+		#Header_Type = IPv6
+		#Dest_Mac_Address = $Mac_Multicast
+	}
+}
+
+packet Echo_Request {
+	header ICMPv6 {
+		ICMP_Type  = 155
+		Code  = 0
+		Message_Body = [ cat 00 00 00]
+	}
+	header IPv6 {
+		Next_Header  = $ICMPv6
+		Source_Address  = $TN_IPv6
+		Destination_Address  = $RPL_multicast_address
+	}
+	header 6LoWPAN {
+		Dest_Mac_Address = $Mac_Multicast
+		Header_Type = IPv6
+		#Header_Type = LOWPAN_HC1
+	}
+}
+
+packet DIO {
+	header RPL {
+		Instance_Id = 20
+   		Version = 242
+   		Rank = 256
+   		Gounded = 0
+   		Mop = 2
+   		Dag_Id = 11 #[cat 11 11 00 11 00 00 00 00 00 00 00 00 00 00 11 00]
+		Interval_Doublings = 8
+    		Interval_Min = 12
+   		Redundancy_Constant = 10
+   		Max_Rank_Inc = 1792
+   		Min_Hop_Rank_Inc = 256
+		Default_Lifetime = 255
+		Lifetime_Unit = 65535
+   		Prefix = [bb bb 00 00 00 00 00 00 00 00 00 00 00 00 00 00]
+
+	}
+}
+
+create6LoWPAN Echo_Request
+create6LoWPAN Neighbor_Advertisement
+
+
+
+delay 10
+auto_reply_na on
+#send6LoWPAN Echo_Request
+#send Neighbor_Advertisement
+#send_frag 1 1 Neighbor_Advertisement
+#send_frag 2 1 Neighbor_Advertisement
+#send6LoWPAN Neighbor_Advertisement
+#send6LoWPAN Echo_Request
+receive 100 0 <icmpv6:0 1 0x81>
+#send6LoWPAN Neighbor_Solicitation
+
+#receive 40 1 <icmpv6:0 1 0x88><icmpv6:8 16 $NUT_IPv6>
